@@ -86,7 +86,7 @@ public class ResourceController {
         }
     }
 
-    @Scheduled(cron = "0 48 17 * * *")
+    @Scheduled(cron = "0 33 18 * * *")
     public void postDailySummary() {
         ClusterItem newEntry = extractSummary();
         ItemListRepo.save(newEntry);

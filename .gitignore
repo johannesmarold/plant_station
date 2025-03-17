@@ -1,7 +1,5 @@
 .DS_Store
-plantStationBackend/.idea
-plantStationBackend/.mvn
-plantStationBackend/target
-plantStationBackend/src/main/resources
-plantStationFrontend/.vscode
-plantStationFrontend/node_modules
+.idea
+.mvn
+target
+src/main/resources
