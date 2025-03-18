@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @EnableScheduling
 @EnableAsync
@@ -26,18 +27,17 @@ public class ResourceController {
 
     @GetMapping("/plant_station/latest")
     public ResponseEntity<?> getLatestDht11Data() {
-        dht11Data d = new dht11Data(10, 20, "2025-02-20<T10:12");
-        System.out.println("hier");
-        dht11DataList.add(d);
-        dht11Data latest = dht11DataList.getLast();
-        if (latest != null) {
+        try {
+            dht11Data latest = dht11DataList.getLast();
             return ResponseEntity.ok().body(latest);
         }
-        else {
-            return ResponseEntity.noContent().build();
+        catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().body("no entry in dht11 DataList.");
         }
+
     }
 
+    // get data base entry by name (which currently is currently date as string)
     @GetMapping("/plant_station/data")
     public ResponseEntity<?> getItemByName(@RequestParam(value = "name") String name) {
         System.out.println("Getting item by name: " + name);
@@ -51,6 +51,7 @@ public class ResourceController {
         }
     }
 
+    // receives a new dht11 data entry from sensor (should be every hour) and stores it locally in list
     @PostMapping("/plant_station")
     public ResponseEntity<?> postItem(@Validated @RequestBody dht11Data newEntry) {
         if (newEntry != null) {
@@ -86,6 +87,7 @@ public class ResourceController {
         }
     }
 
+    // once per day accumulated data of the day is sent to data base
     @Scheduled(cron = "0 33 18 * * *")
     public void postDailySummary() {
         ClusterItem newEntry = extractSummary();
@@ -121,7 +123,7 @@ public class ResourceController {
         Stats Temp = new Stats(minTemp, maxTemp, meanTemp);
         Stats Hum = new Stats(minHum, maxHum, meanHum);
         LocalDate date = LocalDate.now();
-        String name = date.toString();
+        String name = date.toString(); // TODO replace with useful alternative
 
         return new ClusterItem(name, Temp, Hum, date);
     }

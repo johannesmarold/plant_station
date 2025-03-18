@@ -6,7 +6,7 @@ public class dht11Data {
 
     private float temperature;
     private float humidity;
-    private LocalDateTime date;
+    private LocalDateTime date; //format "YYYY-MM-DDThh:mm"
 
     public dht11Data(float temperature, float humidity, String date) {
         this.temperature = temperature;
