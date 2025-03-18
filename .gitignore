@@ -2,4 +2,5 @@
 .idea
 .mvn
 target
-src/main/resources
+src/main/resources/application.properties
+src/main/resources/templates

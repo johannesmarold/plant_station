@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Temperature and Humidity Sensor Web Server</title>
+    <meta http-equiv="refresh" content="5">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            display: inline-block;
+            text-align: center;
+        }
+        p {
+            font-size: 1.2rem;
+        }
+        body {
+            margin: 0;
+        }
+        .topnav {
+            overflow: hidden;
+            background-color: white;
+            color: rgb(68, 61, 61);
+            font-size: 2rem;
+        }
+        .content {
+            padding: 20px;
+        }
+        .card {
+            background-color: rgb(213, 207, 207);
+            border-radius: 20px;
+        }
+        .cards {
+            max-width: 700px;
+            margin: 0 auto;
+            display: grid;
+            grid-gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        .reading {
+            font-size: 2.8rem;
+        }
+        .card.temperature {
+            color: #a64812;
+        }
+        .card.humidity {
+            color: #326cbc;
+        }
+    </style>
+    <script>
+        const socket = new WebSocket("ws://localhost:8080/sensorData");
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            console.log(data);
+            document.getElementById("temperature").innerHTML = data.temperature.toFixed(2) + "&#176C";
+            document.getElementById("humidity").innerHTML = data.humidity.toFixed(2) + "%";
+        };
+
+        socket.onopen = function() {
+            console.log("WebSocket connection established.");
+        };
+
+        socket.onclose = function() {
+            console.log("WebSocket connection closed.");
+        };
+
+        socket.onerror = function(error) {
+            console.error("WebSocket error:", error);
+        };
+    </script>
+</head>
+<body>
+<div class="topnav">
+    <h3>Temperature and Humidity Sensor Web Server</h3>
+</div>
+<div class="content">
+    <div class="cards">
+        <div class="card temperature">
+            <h4>TEMPERATURE</h4>
+            <p><span id="temperature" class="reading">%.2f &deg;C</span></p>
+        </div>
+        <div class="card humidity">
+            <h4>HUMIDITY</h4>
+            <p><span id="humidity" class="reading">%.2f &percnt;</span></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
