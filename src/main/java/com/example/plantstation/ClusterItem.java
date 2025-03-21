@@ -1,7 +1,6 @@
 package com.example.plantstation;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDate;
 
 @Document(collection = "data")

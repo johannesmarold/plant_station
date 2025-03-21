@@ -2,7 +2,9 @@
 <html>
 <head>
     <title>Temperature and Humidity Sensor Web Server</title>
-    <meta http-equiv="refresh" content="5">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <!--<meta http-equiv="refresh" content="5">-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         html {
@@ -47,25 +49,22 @@
         }
     </style>
     <script>
-        const socket = new WebSocket("ws://localhost:8080/sensorData");
+        const socket = new SockJS('http://localhost:8080/ws');
+        const stompClient = Stomp.over(socket);
+        stompClient.connect({}, () => {
+            console.log('Connected to WebSocket');
 
-        socket.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            console.log(data);
-            document.getElementById("temperature").innerHTML = data.temperature.toFixed(2) + "&#176C";
-            document.getElementById("humidity").innerHTML = data.humidity.toFixed(2) + "%";
-        };
+            stompClient.subscribe('/topic/sensorData', (message) => {
+                const data = JSON.parse(message.body);
+                document.getElementById("temperature").innerText = data.temperature.toFixed(2);
+                document.getElementById("humidity").innerText = data.humidity.toFixed(2);
+            });
 
-        socket.onopen = function() {
-            console.log("WebSocket connection established.");
-        };
-
-        socket.onclose = function() {
-            console.log("WebSocket connection closed.");
-        };
-
-        socket.onerror = function(error) {
-            console.error("WebSocket error:", error);
+            // ✅ Request latest data immediately after connecting
+            stompClient.send("/app/latestData", {});
+        });
+        stompClient.onStompError = (frame) => {
+            console.error("❌ STOMP error:", frame);
         };
     </script>
 </head>

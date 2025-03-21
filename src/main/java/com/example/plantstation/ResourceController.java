@@ -47,7 +47,7 @@ public class ResourceController {
             return ResponseEntity.ok().body(item);
         }
         else {
-            return ResponseEntity.badRequest().body("Item " + name + "not found");
+            return ResponseEntity.badRequest().body("Item " + name + " not found");
         }
     }
 
@@ -88,7 +88,7 @@ public class ResourceController {
     }
 
     // once per day accumulated data of the day is sent to data base
-    @Scheduled(cron = "0 33 18 * * *")
+    @Scheduled(cron = "0 00 18 * * *")
     public void postDailySummary() {
         ClusterItem newEntry = extractSummary();
         ItemListRepo.save(newEntry);
@@ -117,8 +117,11 @@ public class ResourceController {
                 minHum = el.getAirHumidity();
             }
         }
-        float meanTemp = sumTemp / dht11DataList.size();
-        float meanHum = sumHum / dht11DataList.size();
+        //float meanTemp = sumTemp / dht11DataList.size();
+        //float meanHum = sumHum / dht11DataList.size();
+        float meanTemp = 2.21F;
+        float meanHum = 45.11F;
+
 
         Stats Temp = new Stats(minTemp, maxTemp, meanTemp);
         Stats Hum = new Stats(minHum, maxHum, meanHum);
