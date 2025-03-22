@@ -1,6 +1,5 @@
 .DS_Store
 .idea
-.mvn
 
 src/main/resources/application.properties
 src/main/resources/templates
