@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Temperature and Humidity Sensor Web Server</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <!--<meta http-equiv="refresh" content="5">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            display: inline-block;
+            text-align: center;
+        }
+        p {
+            font-size: 1.2rem;
+        }
+        body {
+            margin: 0;
+        }
+        .topnav {
+            overflow: hidden;
+            background-color: white;
+            color: rgb(68, 61, 61);
+            font-size: 2rem;
+        }
+        .content {
+            padding: 20px;
+        }
+        .card {
+            background-color: rgb(213, 207, 207);
+            border-radius: 20px;
+        }
+        .cards {
+            max-width: 700px;
+            margin: 0 auto;
+            display: grid;
+            grid-gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        .reading {
+            font-size: 2.8rem;
+        }
+        .card.temperature {
+            color: #a64812;
+        }
+        .card.humidity {
+            color: #326cbc;
+        }
+    </style>
+    <script>
+        const socket = new SockJS('http://localhost:3000/ws');
+        const stompClient = Stomp.over(socket);
+        stompClient.connect({}, () => {
+            console.log('Connected to WebSocket');
+
+            stompClient.subscribe('/topic/sensorData', (message) => {
+                const data = JSON.parse(message.body);
+                document.getElementById("temperature").innerText = data.temperature.toFixed(2);
+                document.getElementById("humidity").innerText = data.humidity.toFixed(2);
+            });
+
+            // ✅ Request latest data immediately after connecting
+            stompClient.send("/app/latestData", {});
+        });
+        stompClient.onStompError = (frame) => {
+            console.error("❌ STOMP error:", frame);
+        };
+    </script>
+</head>
+<body>
+<div class="topnav">
+    <h3>Temperature and Humidity Sensor Web Server</h3>
+</div>
+<div class="content">
+    <div class="cards">
+        <div class="card temperature">
+            <h4>TEMPERATURE</h4>
+            <p><span id="temperature" class="reading">%.2f &deg;C</span></p>
+        </div>
+        <div class="card humidity">
+            <h4>HUMIDITY</h4>
+            <p><span id="humidity" class="reading">%.2f &percnt;</span></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
