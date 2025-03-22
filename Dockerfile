@@ -1,14 +1,12 @@
-FROM eclipse-temurin:21-jdk as build
-COPY . /app
+# Step 1: Use Java 21 JDK for building
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
-#RUN ./mvnw --no-transfer-progress clean package -DskipTests
+COPY . .
 RUN ./mvnw package -DskipTests
-RUN mv -f target/*.jar app.jar
 
+# Step 2: Use Java 21 JRE for running
 FROM eclipse-temurin:21-jre
-ARG PORT=3000
-ENV PORT=${PORT}
-COPY --from=build /app/app.jar .
-RUN useradd runtime
-USER runtime
-ENTRYPOINT [ "java", "-Dserver.port=${PORT}", "-jar", "app.jar" ]
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 3000
+ENTRYPOINT ["java", "-jar", "app.jar"]
