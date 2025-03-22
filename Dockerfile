@@ -2,6 +2,8 @@
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 COPY . .
+# Make mvnw executable
+RUN chmod +x mvnw
 RUN ./mvnw package -DskipTests
 
 # Step 2: Use Java 21 JRE for running
