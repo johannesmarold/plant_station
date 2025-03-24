@@ -49,7 +49,7 @@
         }
     </style>
     <script>
-        const socket = new SockJS('http://localhost:3000/ws');
+        const socket = new SockJS('https://localhost:3000/ws');
         const stompClient = Stomp.over(socket);
         stompClient.connect({}, () => {
             console.log('Connected to WebSocket');
